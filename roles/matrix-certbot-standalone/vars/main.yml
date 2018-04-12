@@ -1,0 +1,8 @@
+---
+# matrix_certbot_cert_domains
+# matrix_certbot_admin_email
+matrix_certbot_main_domain: "{{ matrix_certbot_cert_domains | first }}"
+matrix_certbot_testing: true
+matrix_certbot_http_port: 18888
+
+# vars file for matrix-certbot-standalone

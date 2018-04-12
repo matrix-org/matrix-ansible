@@ -1,0 +1,16 @@
+galaxy_info:
+  author: michaelkaye
+  description: Install and configure sydent from git
+
+  license: Apache 2.0
+
+  min_ansible_version: 2.0
+
+  platforms:
+   - name: Debian
+     versions:
+     - jessie
+
+  galaxy_tags: []
+
+dependencies: []

@@ -1,0 +1,14 @@
+[Unit]
+Description="Matrix Synapse Server (synapse)"
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/synapse
+ExecStart=/opt/synapse/env/bin/python -m synapse.app.homeserver --config-path=/opt/synapse/homeserver.yaml
+ExecStop=/opt/synapse/env/bin/synctl stop /opt/synapse/homeserver.yaml
+User=synapse
+Group=synapse
+
+[Install]
+WantedBy=default.target
+

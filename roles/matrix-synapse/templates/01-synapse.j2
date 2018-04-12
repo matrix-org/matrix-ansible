@@ -1,0 +1,8 @@
+#!/bin/bash
+mkdir -p /opt/synapse/ssl/
+chown synapse:synapse /opt/synapse/ssl
+cp /etc/letsencrypt/live/{{ matrix_synapse_domain }}/fullchain.pem /opt/synapse/ssl/{{ matrix_synapse_domain }}.crt
+chown synapse:synapse /opt/synapse/ssl/{{ matrix_synapse_domain }}.crt
+cp /etc/letsencrypt/live/{{ matrix_synapse_domain }}/privkey.pem /opt/synapse/ssl/{{ matrix_synapse_domain }}.key
+chown synapse:synapse /opt/synapse/ssl/{{ matrix_synapse_domain }}.key
+service matrix-synapse restart

@@ -1,0 +1,162 @@
+---
+- name: create user
+  user:
+    name: synapse
+    state: present
+
+- name: create directory
+  file:
+    name: /opt/synapse
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Create directory for media storage
+  file:
+    name: /opt/synapse/media_store
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Create directory for uploads
+  file:
+    name: /opt/synapse/uploads
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - python2.7-dev
+    - libffi-dev
+    - python-pip
+    - python-setuptools
+    - sqlite3
+    - libssl-dev
+    - python-virtualenv
+    - libjpeg-dev
+    - libxslt1-dev
+    - git
+    - python-psycopg2
+
+- name: Create virtualenv
+  pip:
+    name: 
+      - pip
+      - setuptools
+      - lxml
+      - psycopg2
+      - mock
+    virtualenv: /opt/synapse/env
+    virtualenv_python: python2.7
+    extra_args: --upgrade
+  become_user: synapse
+
+- name: Clone synapse
+  git: 
+    repo: https://github.com/matrix-org/synapse
+    dest: /opt/synapse/synapse
+    accept_hostkey: yes
+    version: "{{ matrix_synapse_version }}"
+  become_user: synapse
+  register: clone_synapse
+
+- name: Install Synapse
+  pip:
+    name: /opt/synapse/synapse
+    virtualenv: /opt/synapse/env
+    virtualenv_python: python2.7
+  become_user: synapse
+  when: clone_synapse.changed
+
+- name: ensure SSL directory 
+  file: 
+    name: /opt/synapse/ssl
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Create signing key
+  shell: /opt/synapse/env/bin/python -c "from signedjson import key; file = open('/opt/synapse/ssl/{{ matrix_synapse_domain}}.signing.key','w'); key.write_signing_keys(file, [key.generate_signing_key('first')]); file.close()"
+  args:
+    creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.signing.key
+  become_user: synapse
+  notify: 
+    - "restart synapse"
+
+#- name: Create database (local)
+#  include_tasks: localdb.yml
+#  when: matrix_hosted_homeservers.internal_postgres
+#- name: Create database (remote)
+#  include_tasks: remotedb.yml
+#  when: "{{ !matrix_hosted_homeservers.internal_postgres}}"
+
+- name: create logging folder
+  file:
+    name: /var/log/synapse/
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Deploy log config
+  template:
+    src: "log.config.j2"
+    dest: "/opt/synapse/{{ matrix_synapse_domain }}.log.config"
+    owner: synapse
+    group: synapse
+  notify: 
+    - "restart synapse"
+
+- name: Deploy config
+  template:
+    src: "homeserver.yaml.j2"
+    dest: "/opt/synapse/homeserver.yaml"
+    owner: synapse
+    group: synapse
+  notify: 
+    - "restart synapse"
+
+- name: Deploy service file
+  template:
+    src: "matrix-synapse.service.j2"
+    dest: "/etc/systemd/system/matrix-synapse.service"
+  register: service_file
+
+- name: ensure hook directory available
+  file:
+    name: /etc/letsencrypt/renewal-hooks/deploy/
+    state: directory
+
+- name: template ssl post-renewal copier into place
+  template:
+    src: 01-synapse.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
+    mode: 0700
+  register: ssl_renewal
+
+- name: run post-renewal copier
+  command: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
+  when: ssl_renewal.changed
+
+
+- name: create DH parameters
+  command: openssl dhparam -out ssl/{{ matrix_synapse_domain }}.dh 2048
+  args:
+    creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.dh
+    chdir: /opt/synapse
+  become_user: synapse
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  when: service_file.changed
+
+- name: Start synapse
+  systemd:
+    name: matrix-synapse
+    state: started
+  when: matrix_synapse_autostart

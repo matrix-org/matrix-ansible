@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+cat /etc/letsencrypt/live/{{ matrix_certbot_main_domain}}/{privkey,fullchain}.pem> /etc/letsencrypt/live/{{ matrix_certbot_main_domain }}/combined.pem

@@ -1,0 +1,24 @@
+---
+matrix_sydent_autostart: true
+matrix_sydent_home: "/opt/sydent"
+matrix_sydent_server_name: "{{ matrix_sydent_domain }}"
+matrix_sydent_cert_home: "{{matrix_sydent_home}}/ssl"
+matrix_sydent_cacert: "{{ matrix_sydent_cert_home}}/ca.crt"
+matrix_sydent_certfile: "{{ matrix_sydent_cert_home}}/{{ matrix_sydent_domain }}.pem"
+matrix_sydent_http_base: "https://{{ matrix_sydent_domain }}"
+matrix_sydent_sqlite_db: "{{ matrix_sydent_home }}/sydent.db"
+matrix_sydent_log_file: "/var/log/sydent/sydent.log"
+
+matrix_sydent_localca_client_key: "{{ matrix_sydent_cert_home }}/{{matrix_sydent_domain}}.key"
+matrix_sydent_localca_csr: "{{ matrix_sydent_cert_home }}/{{matrix_sydent_domain}}.csr"
+matrix_sydent_localca_crt: "{{ matrix_sydent_cert_home }}/{{matrix_sydent_domain}}.crt"
+matrix_sydent_localca_local_csr: "{{ matrix_sydent_localca_local_home }}/{{matrix_sydent_domain}}.csr"
+matrix_sydent_localca_local_crt: "{{ matrix_sydent_localca_local_home }}/{{matrix_sydent_domain}}.csr"
+matrix_sydent_localca_local_ca_crt: "{{ matrix_sydent_localca_local_home }}/ca/ca.crt"
+matrix_sydent_localca_local_ca_key: "{{ matrix_sydent_localca_local_home }}/ca/ca.key"
+
+matrix_sydent_response_template: "res/verify_response_page_template.eml"
+matrix_sydent_email_from: "Tchap Validation <noreply@{{ matrix_sydent_domain }}>"
+matrix_sydent_email_template: "res/verification_template.eml"
+matrix_sydent_email_invite_template: "res/invite_template.eml"
+matrix_sydent_email_invite_subject: "%(sender_display_name)s vous a invité sur Tchap"

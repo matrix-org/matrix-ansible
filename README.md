@@ -1,8 +1,5 @@
 # matrix-ansible-roles
 
-CAUTION
-=======
+These roles are currently in a unstable form as we start using them in production situations.
 
-These roles are currently under development.
-
-Their APIs are currently unstable and caution should be used if depending on them.
+At the moment expect breaking changes can occur between tagged releases.

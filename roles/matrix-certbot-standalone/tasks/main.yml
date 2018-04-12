@@ -1,0 +1,30 @@
+---
+- name: Install certbot
+  apt:
+    name: certbot
+    state: latest
+
+- name: Check for certificate existing
+  stat: 
+    path: /etc/letsencrypt/live/{{ matrix_certbot_main_domain }}/combined.pem
+  register: matrix_certbot_cert
+
+- name: Create hook directory
+  file:
+    name: /etc/letsencrypt/renewal-hooks/deploy
+    state: directory
+
+- name: Create hook for combining certificates
+  template:
+    src: 00-combine.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/00-combine
+    mode: 0700
+
+- name: Run in standalone mode
+  shell: certbot certonly --standalone {{ matrix_certbot_testing | ternary("--staging", "") }} --http-01-port {{ matrix_certbot_http_port }} --noninteractive --agree-tos --email {{ matrix_certbot_admin_email }} -d {{ matrix_certbot_cert_domains | join(" -d ")}} 
+  when: not matrix_certbot_cert.stat.exists
+
+- name: Run post-deploy scripts as if we'd just renewed
+  command: run-parts /etc/letsencrypt/renewal-hooks/deploy/
+  when: not matrix_certbot_cert.stat.exists
+

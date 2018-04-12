@@ -1,0 +1,11 @@
+[Unit]
+Description="Matrix Identity Server (sydent)"
+
+[Service]
+ExecStart=/bin/bash -c "{{matrix_sydent_home}}/env/bin/python -m sydent.sydent"
+WorkingDirectory={{matrix_sydent_home}}
+User=sydent
+
+[Install]
+WantedBy=default.target
+

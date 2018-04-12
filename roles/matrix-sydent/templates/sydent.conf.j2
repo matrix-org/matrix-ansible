@@ -1,0 +1,34 @@
+[DEFAULT]
+
+[general]
+token.length = 6
+server.name = {{ matrix_sydent_server_name }}
+log.path = {{ matrix_sydent_log_file }}
+pidfile.path = sydent.pid
+
+[db]
+db.file = {{ matrix_sydent_sqlite_db }}
+
+[http]
+replication.https.cacert = {{ matrix_sydent_cacert }}
+replication.https.certfile = {{ matrix_sydent_certfile }}
+replication.https.port = 4434
+obey_x_forwarded_for = True
+client_http_base = {{ matrix_sydent_http_base }}
+clientapi.http.port = 8090
+verify_response_template = {{ matrix_sydent_response_template }}
+
+[email]
+email.tlsmode = 0
+email.smtppassword = 
+email.smtphost = localhost
+email.from = {{ matrix_sydent_email_from }}
+email.template = {{ matrix_sydent_email_template }}
+email.invite_template = {{ matrix_sydent_email_invite_template }}
+email.invite.subject = {{ matrix_sydent_email_invite_subject }}
+email.smtpport = 25
+
+[crypto]
+ed25519.signingkey = {{ matrix_sydent_signingkey }}
+
+[sms]

@@ -1,0 +1,6 @@
+---
+- name: "restart synapse"
+  service:
+    name: "matrix-synapse"
+    state: restarted
+# handlers file for roles/matrix-synapse
