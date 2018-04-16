@@ -1,0 +1,5 @@
+install:
+  - pip install ansible-lint
+
+script:
+  - FAILED=0; for x in roles/* ; do ansible-lint $x/ || FAILED=1; done; exit $FAILED
