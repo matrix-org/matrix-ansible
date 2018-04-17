@@ -73,7 +73,10 @@
     virtualenv: /opt/synapse/env
     virtualenv_python: python2.7
   become_user: synapse
+  become: true
   when: clone_synapse.changed
+  tags:
+    - skip_ansible_lint # skip should be handler check
 
 - name: ensure SSL directory
   file:
@@ -87,6 +90,7 @@
   args:
     creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.signing.key
   become_user: synapse
+  become: true
   notify:
     - "restart synapse"
 
@@ -136,6 +140,8 @@
 - name: run post-renewal copier
   command: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
   when: ssl_renewal.changed
+  tags:
+    - skip_ansible_lint # skip should be handler check
 
 - name: create DH parameters
   command: openssl dhparam -out ssl/{{ matrix_synapse_domain }}.dh 2048
@@ -149,6 +155,8 @@
   systemd:
     daemon_reload: yes
   when: service_file.changed
+  tags:
+    - skip_ansible_lint # skip should be handler check
 
 - name: Start synapse
   systemd:
