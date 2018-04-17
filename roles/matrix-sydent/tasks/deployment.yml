@@ -1,9 +1,9 @@
 ---
 - name: Install sqlite3
   apt:
-    name: sqlite3
+    name: sqlite3=3.16.*
     default_release: jessie-backports
-    state: latest
+    state: present
 
 - name: create log folder
   file:
@@ -14,21 +14,23 @@
 
 - name: Create virtualenv
   pip:
-    name: 
+    name:
       - pip
       - setuptools
     virtualenv: "{{ matrix_sydent_home }}/env"
     virtualenv_python: python2.7
     extra_args: --upgrade
   become_user: sydent
+  become: true
 
 - name: Clone syndent
-  git: 
+  git:
     repo: https://github.com/matrix-org/sydent
     dest: "{{ matrix_sydent_home }}/sydent"
     accept_hostkey: yes
     version: "{{ matrix_sydent_tag }}"
   become_user: sydent
+  become: true
   register: clone_sydent
 
 - name: Install Sydent
@@ -38,8 +40,9 @@
     virtualenv: "{{ matrix_sydent_home}}/env"
     virtualenv_python: python2.7
   become_user: sydent
+  become: true
   when: clone_sydent.changed
-      
+
 - name: template sydent configuration
   template:
     src: sydent.conf.j2
@@ -48,12 +51,12 @@
     owner: sydent
 
 - name:
-  template: 
+  template:
     src: matrix-sydent.service.j2
     dest: /etc/systemd/system/matrix-sydent.service
 
 - name: reload systemd
-  systemd: 
+  systemd:
     daemon_reload: yes
 
 - name: ensure sydent running

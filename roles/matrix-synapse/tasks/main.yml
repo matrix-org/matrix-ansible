@@ -45,7 +45,7 @@
 
 - name: Create virtualenv
   pip:
-    name: 
+    name:
       - pip
       - setuptools
       - lxml
@@ -55,14 +55,16 @@
     virtualenv_python: python2.7
     extra_args: --upgrade
   become_user: synapse
+  become: true
 
 - name: Clone synapse
-  git: 
+  git:
     repo: https://github.com/matrix-org/synapse
     dest: /opt/synapse/synapse
     accept_hostkey: yes
     version: "{{ matrix_synapse_version }}"
   become_user: synapse
+  become: true
   register: clone_synapse
 
 - name: Install Synapse
@@ -73,8 +75,8 @@
   become_user: synapse
   when: clone_synapse.changed
 
-- name: ensure SSL directory 
-  file: 
+- name: ensure SSL directory
+  file:
     name: /opt/synapse/ssl
     state: directory
     owner: synapse
@@ -85,15 +87,8 @@
   args:
     creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.signing.key
   become_user: synapse
-  notify: 
+  notify:
     - "restart synapse"
-
-#- name: Create database (local)
-#  include_tasks: localdb.yml
-#  when: matrix_hosted_homeservers.internal_postgres
-#- name: Create database (remote)
-#  include_tasks: remotedb.yml
-#  when: "{{ !matrix_hosted_homeservers.internal_postgres}}"
 
 - name: create logging folder
   file:
@@ -108,7 +103,7 @@
     dest: "/opt/synapse/{{ matrix_synapse_domain }}.log.config"
     owner: synapse
     group: synapse
-  notify: 
+  notify:
     - "restart synapse"
 
 - name: Deploy config
@@ -117,7 +112,7 @@
     dest: "/opt/synapse/homeserver.yaml"
     owner: synapse
     group: synapse
-  notify: 
+  notify:
     - "restart synapse"
 
 - name: Deploy service file
@@ -142,13 +137,13 @@
   command: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
   when: ssl_renewal.changed
 
-
 - name: create DH parameters
   command: openssl dhparam -out ssl/{{ matrix_synapse_domain }}.dh 2048
   args:
     creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.dh
     chdir: /opt/synapse
   become_user: synapse
+  become: true
 
 - name: Reload systemd
   systemd:
