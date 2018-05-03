@@ -1,11 +1,11 @@
 ---
 - name: Install certbot
   apt:
-    name: certbot
-    state: latest
+    name: certbot=0.10.2*
+    state: present
 
 - name: Check for certificate existing
-  stat: 
+  stat:
     path: /etc/letsencrypt/live/{{ matrix_certbot_main_domain }}/combined.pem
   register: matrix_certbot_cert
 
@@ -21,8 +21,10 @@
     mode: 0700
 
 - name: Run in standalone mode
-  shell: certbot certonly --standalone {{ matrix_certbot_testing | ternary("--staging", "") }} --http-01-port {{ matrix_certbot_http_port }} --noninteractive --agree-tos --email {{ matrix_certbot_admin_email }} -d {{ matrix_certbot_cert_domains | join(" -d ")}} 
+  shell: certbot certonly --standalone {{ matrix_certbot_testing | ternary("--staging", "") }} --http-01-port {{ matrix_certbot_http_port }} --noninteractive --agree-tos --email {{ matrix_certbot_admin_email }} -d {{ matrix_certbot_cert_domains | join(" -d ")}}
   when: not matrix_certbot_cert.stat.exists
+  tags:
+    - skip_ansible_lint # certbot ansible module does not support this yet
 
 - name: Run post-deploy scripts as if we'd just renewed
   command: run-parts /etc/letsencrypt/renewal-hooks/deploy/
