@@ -1,6 +1,4 @@
 ---
-matrix_synapse_configure: true
-matrix_synapse_autostart: true
 matrix_synapse_tls_path: "/opt/synapse/ssl/{{ matrix_synapse_domain }}.crt"
 matrix_synapse_key_path: "/opt/synapse/ssl/{{ matrix_synapse_domain }}.key"
 matrix_synapse_dh_path: "/opt/synapse/ssl/{{ matrix_synapse_domain }}.dh"
