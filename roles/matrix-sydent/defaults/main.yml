@@ -1,4 +1,3 @@
 ---
 local_ca_home: "/home/delph/cahome"
-matrix_sydent_configure: "true"
 # defaults file for roles/matrix-sydent

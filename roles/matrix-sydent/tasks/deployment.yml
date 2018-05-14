@@ -56,3 +56,4 @@
   when: clone_sydent.changed
   tags:
     - skip_ansible_lint # skip should be handler check
+  notify: "restart matrix-sydent"

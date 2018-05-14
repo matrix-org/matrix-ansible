@@ -1,5 +1,4 @@
 ---
-matrix_sydent_autostart: true
 matrix_sydent_home: "/opt/sydent"
 matrix_sydent_server_name: "{{ matrix_sydent_domain }}"
 matrix_sydent_cert_home: "{{matrix_sydent_home}}/ssl"

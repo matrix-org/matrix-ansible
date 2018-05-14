@@ -3,12 +3,6 @@
   template: 
     src: matrix-sydent.service.j2
     dest: /etc/systemd/system/matrix-sydent.service
-
-- name: reload systemd
-  systemd: 
-    daemon_reload: yes
-
-- name: ensure sydent running
-  systemd:
-    name: matrix-sydent
-    state: started
+  notify:
+    - "reload systemd"
+    - "restart matrix-sydent"
