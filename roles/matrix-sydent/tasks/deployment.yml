@@ -1,4 +1,16 @@
 ---
+- name: Create sydent user
+  user:
+    name: sydent
+    state: present
+
+- name: create folder
+  file:
+    name: "{{ matrix_sydent_home }}"
+    owner: sydent
+    group: sydent
+    state: directory
+
 - name: Install sqlite3
   apt:
     name: sqlite3=3.16.*
@@ -67,5 +79,3 @@
     name: matrix-sydent
     state: started
   when: matrix_sydent_autostart
-
-
