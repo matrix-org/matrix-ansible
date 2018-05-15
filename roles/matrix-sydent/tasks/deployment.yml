@@ -51,6 +51,7 @@
     dest: "{{ matrix_sydent_home}}/sydent.conf"
     group: sydent
     owner: sydent
+  when: matrix_sydent_configure
 
 - name:
   template:
