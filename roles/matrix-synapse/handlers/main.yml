@@ -1,10 +1,11 @@
 ---
+- name: "reload systemd"
+  systemd:
+    daemon_reload: yes
+
 - name: "restart matrix-synapse"
   service:
     name: "matrix-synapse"
     state: restarted
     enabled: yes
 
-- name: "reload systemd"
-  systemd:
-    daemon_reload: yes
