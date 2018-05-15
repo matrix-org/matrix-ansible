@@ -14,7 +14,7 @@
     group: synapse
 
 - name: Create directory for SSL files
-  file: 
+  file:
     name: /opt/synapse/ssl
     state: directory
     owner: synapse
@@ -24,8 +24,9 @@
   shell: /opt/synapse/env/bin/python -c "from signedjson import key; file = open('/opt/synapse/ssl/{{ matrix_synapse_domain}}.signing.key','w'); key.write_signing_keys(file, [key.generate_signing_key('first')]); file.close()"
   args:
     creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.signing.key
+  become: true
   become_user: synapse
-  notify: 
+  notify:
     - "restart synapse"
 
 - name: create logging folder
@@ -41,7 +42,7 @@
     dest: "/opt/synapse/log.config"
     owner: synapse
     group: synapse
-  notify: 
+  notify:
     - "restart synapse"
 
 - name: Deploy config
@@ -50,7 +51,7 @@
     dest: "/opt/synapse/homeserver.yaml"
     owner: synapse
     group: synapse
-  notify: 
+  notify:
     - "restart synapse"
 
 - name: ensure hook directory available
@@ -68,6 +69,8 @@
 - name: run post-renewal copier
   command: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
   when: ssl_renewal.changed
+  tags:
+    - skip_ansible_lint # because of the when clause
 
 - name: create DH parameters
   command: openssl dhparam -out ssl/{{ matrix_synapse_domain }}.dh 2048
@@ -75,3 +78,4 @@
     creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.dh
     chdir: /opt/synapse
   become_user: synapse
+  become: true

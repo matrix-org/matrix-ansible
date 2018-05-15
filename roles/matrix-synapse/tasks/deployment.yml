@@ -31,7 +31,7 @@
 
 - name: Create virtualenv
   pip:
-    name: 
+    name:
       - pip
       - setuptools
       - lxml
@@ -40,15 +40,17 @@
     virtualenv: /opt/synapse/env
     virtualenv_python: python2.7
     extra_args: --upgrade
+  become: true
   become_user: synapse
 
 - name: Clone synapse
-  git: 
+  git:
     repo: https://github.com/matrix-org/synapse
     dest: /opt/synapse/synapse
     accept_hostkey: yes
     version: "{{ matrix_synapse_version }}"
   become_user: synapse
+  become: true
   register: clone_synapse
 
 - name: Install Synapse
@@ -57,4 +59,7 @@
     virtualenv: /opt/synapse/env
     virtualenv_python: python2.7
   become_user: synapse
+  become: true
   when: clone_synapse.changed
+  tags:
+    - skip_ansible_lint # skip when clause

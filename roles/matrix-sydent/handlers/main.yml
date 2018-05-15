@@ -1,6 +1,6 @@
 ---
 - name: "reload systemd"
-  systemd: 
+  systemd:
     daemon_reload: yes
 
 - name: "restart matrix-sydent"
