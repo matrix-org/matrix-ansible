@@ -1,0 +1,81 @@
+---
+- name: Create directory for media storage
+  file:
+    name: /opt/synapse/media_store
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Create directory for uploads
+  file:
+    name: /opt/synapse/uploads
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Create directory for SSL files
+  file:
+    name: /opt/synapse/ssl
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Create signing key
+  shell: /opt/synapse/env/bin/python -c "from signedjson import key; file = open('/opt/synapse/ssl/{{ matrix_synapse_domain}}.signing.key','w'); key.write_signing_keys(file, [key.generate_signing_key('first')]); file.close()"
+  args:
+    creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.signing.key
+  become: true
+  become_user: synapse
+  notify:
+    - "restart synapse"
+
+- name: create logging folder
+  file:
+    name: /var/log/synapse/
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Deploy log config
+  template:
+    src: "log.config.j2"
+    dest: "/opt/synapse/log.config"
+    owner: synapse
+    group: synapse
+  notify:
+    - "restart synapse"
+
+- name: Deploy config
+  template:
+    src: "homeserver.yaml.j2"
+    dest: "/opt/synapse/homeserver.yaml"
+    owner: synapse
+    group: synapse
+  notify:
+    - "restart synapse"
+
+- name: ensure hook directory available
+  file:
+    name: /etc/letsencrypt/renewal-hooks/deploy/
+    state: directory
+
+- name: template ssl post-renewal copier into place
+  template:
+    src: 01-synapse.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
+    mode: 0700
+  register: ssl_renewal
+
+- name: run post-renewal copier
+  command: /etc/letsencrypt/renewal-hooks/deploy/01-synapse
+  when: ssl_renewal.changed
+  tags:
+    - skip_ansible_lint # because of the when clause
+
+- name: create DH parameters
+  command: openssl dhparam -out ssl/{{ matrix_synapse_domain }}.dh 2048
+  args:
+    creates: /opt/synapse/ssl/{{ matrix_synapse_domain }}.dh
+    chdir: /opt/synapse
+  become_user: synapse
+  become: true

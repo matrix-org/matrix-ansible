@@ -1,4 +1,16 @@
 ---
+- name: Create sydent user
+  user:
+    name: sydent
+    state: present
+
+- name: create folder
+  file:
+    name: "{{ matrix_sydent_home }}"
+    owner: sydent
+    group: sydent
+    state: directory
+
 - name: Install sqlite3
   apt:
     name: sqlite3=3.16.*
@@ -44,27 +56,4 @@
   when: clone_sydent.changed
   tags:
     - skip_ansible_lint # skip should be handler check
-
-- name: template sydent configuration
-  template:
-    src: sydent.conf.j2
-    dest: "{{ matrix_sydent_home}}/sydent.conf"
-    group: sydent
-    owner: sydent
-
-- name:
-  template:
-    src: matrix-sydent.service.j2
-    dest: /etc/systemd/system/matrix-sydent.service
-
-- name: reload systemd
-  systemd:
-    daemon_reload: yes
-
-- name: ensure sydent running
-  systemd:
-    name: matrix-sydent
-    state: started
-  when: matrix_sydent_autostart
-
-
+  notify: "restart matrix-sydent"

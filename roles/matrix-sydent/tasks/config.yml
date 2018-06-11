@@ -1,0 +1,8 @@
+---
+- name: template sydent configuration
+  template:
+    src: sydent.conf.j2
+    dest: "{{ matrix_sydent_home}}/sydent.conf"
+    group: sydent
+    owner: sydent
+  notify: "restart matrix-sydent"

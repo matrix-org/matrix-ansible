@@ -1,6 +1,11 @@
 ---
-- name: "restart synapse"
+- name: "reload systemd"
+  systemd:
+    daemon_reload: yes
+
+- name: "restart matrix-synapse"
   service:
     name: "matrix-synapse"
     state: restarted
-# handlers file for roles/matrix-synapse
+    enabled: yes
+

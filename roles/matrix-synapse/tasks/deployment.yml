@@ -1,0 +1,65 @@
+---
+- name: create user
+  user:
+    name: synapse
+    state: present
+
+- name: create directory
+  file:
+    name: /opt/synapse
+    state: directory
+    owner: synapse
+    group: synapse
+
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - python2.7-dev
+    - libffi-dev
+    - python-pip
+    - python-setuptools
+    - sqlite3
+    - libssl-dev
+    - python-virtualenv
+    - libjpeg-dev
+    - libxslt1-dev
+    - git
+    - libpq-dev
+
+- name: Create virtualenv
+  pip:
+    name:
+      - pip
+      - setuptools
+      - lxml
+      - psycopg2-binary
+      - mock
+    virtualenv: /opt/synapse/env
+    virtualenv_python: python2.7
+    extra_args: --upgrade
+  become: true
+  become_user: synapse
+
+- name: Clone synapse
+  git:
+    repo: https://github.com/matrix-org/synapse
+    dest: /opt/synapse/synapse
+    accept_hostkey: yes
+    version: "{{ matrix_synapse_version }}"
+  become_user: synapse
+  become: true
+  register: clone_synapse
+
+- name: Install Synapse
+  pip:
+    name: /opt/synapse/synapse
+    virtualenv: /opt/synapse/env
+    virtualenv_python: python2.7
+  become_user: synapse
+  become: true
+  when: clone_synapse.changed
+  tags:
+    - skip_ansible_lint # skip when clause

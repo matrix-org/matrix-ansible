@@ -1,2 +1,10 @@
 ---
-# handlers file for roles/matrix-sydent
+- name: "reload systemd"
+  systemd:
+    daemon_reload: yes
+
+- name: "restart matrix-sydent"
+  systemd:
+    name: matrix-sydent
+    state: started
+    enabled: true

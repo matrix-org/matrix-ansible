@@ -1,0 +1,8 @@
+---
+- name: Template sydent service file
+  template:
+    src: matrix-sydent.service.j2
+    dest: /etc/systemd/system/matrix-sydent.service
+  notify:
+    - "reload systemd"
+    - "restart matrix-sydent"
