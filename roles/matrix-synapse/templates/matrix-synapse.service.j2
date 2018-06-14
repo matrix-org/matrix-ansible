@@ -8,6 +8,7 @@ ExecStart=/opt/synapse/env/bin/python -m synapse.app.homeserver --config-path=/o
 ExecStop=/opt/synapse/env/bin/synctl stop /opt/synapse/homeserver.yaml
 User=synapse
 Group=synapse
+Restart=always
 
 [Install]
 WantedBy=default.target
