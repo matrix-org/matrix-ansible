@@ -10,13 +10,6 @@ filters:
     request: ""
 
 handlers:
-  file:
-    class: logging.handlers.RotatingFileHandler
-    formatter: precise
-    filename: /var/log/synapse/{{ matrix_synapse_domain }}.homeserver.log
-    maxBytes: 104857600
-    backupCount: 10
-    filters: [context]
   console:
     class: logging.StreamHandler
     formatter: precise
@@ -31,9 +24,6 @@ loggers:
         # information such as access tokens.
         level: INFO
 
-    antiscam:
-        level: DEBUG
-
 root:
     level: INFO
-    handlers: [file, console]
+    handlers: [console]

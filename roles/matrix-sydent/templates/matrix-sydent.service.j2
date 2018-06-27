@@ -6,7 +6,10 @@ ExecStart=/bin/bash -c "{{matrix_sydent_home}}/env/bin/python -m sydent.sydent"
 WorkingDirectory={{matrix_sydent_home}}
 User=sydent
 Group=sydent
-Restart=on-failure
+Restart=always
+StandardOut=syslog
+SyslogIdentifier=matrix-sydent
+SyslogFacility=local3
 
 [Install]
 WantedBy=default.target
