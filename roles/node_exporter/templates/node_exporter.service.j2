@@ -1,0 +1,17 @@
+[Unit]
+Description="Prometheus Metrics Exporter (node_exporter)"
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/node_exporter
+ExecStart=/opt/node_exporter/releases/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter --collector.systemd
+User=prometheus
+Group=prometheus
+Restart=always
+StandardOut=syslog
+SyslogIdentifier=node_exporter
+SyslogFacility=local3
+
+[Install]
+WantedBy=default.target
+

@@ -1,0 +1,9 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/jessie64"
+  config.vm.provision "ansible" do |ansible|
+    ansible.verbose = "vvv"
+    ansible.playbook = "vagrant-test.yml"
+    ansible.compatibility_mode = "2.0"
+    ansible.config_file = "../../../ansible-test.cfg"
+  end
+end
