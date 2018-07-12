@@ -31,6 +31,7 @@
   get_url:
      url: https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
      dest: /opt/node_exporter/downloads/{{ node_exporter_version }}.tar.gz
+  become: true
   become_user: prometheus
 
 - name: Unpack tarball
