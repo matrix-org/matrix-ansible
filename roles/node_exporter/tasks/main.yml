@@ -1,0 +1,62 @@
+---
+- name: Create user
+  user:
+    name: prometheus
+    state: present
+    create_home: no
+    shell: /bin/bash
+
+- name: Make directory
+  file:
+    path: /opt/node_exporter
+    state: directory
+    owner: prometheus
+    group: prometheus
+
+- name: Make download directory
+  file:
+    path: /opt/node_exporter/downloads
+    state: directory
+    owner: prometheus
+    group: prometheus
+
+- name: Make executables directory
+  file:
+    path: /opt/node_exporter/releases
+    state: directory
+    owner: prometheus
+    group: prometheus
+
+- name: Download node_exporter
+  get_url:
+     url: https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+     dest: /opt/node_exporter/downloads/{{ node_exporter_version }}.tar.gz
+  become: true
+  become_user: prometheus
+
+- name: Unpack tarball
+  unarchive:
+    src: /opt/node_exporter/downloads/{{ node_exporter_version }}.tar.gz
+    remote_src: yes
+    dest: /opt/node_exporter/releases/
+    creates: /opt/node_exporter/releases/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter
+    owner: prometheus
+    group: prometheus
+
+- name: Create systemd config
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+  notify:
+    - "reload systemd"
+    - "restart node_exporter"
+
+- name: "Flush handlers"
+  meta: flush_handlers
+
+- name: enable node_exporter and ensure running
+  service:
+    name: node_exporter
+    state: started
+    enabled: yes
